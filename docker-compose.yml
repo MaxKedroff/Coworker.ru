@@ -1,0 +1,21 @@
+version: '3'
+services:
+  spring-boot-app:
+    build: .
+    ports:
+      - "8070:8070"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/security_db
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+    depends_on:
+      - mysql
+  mysql:
+    build: ./mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
