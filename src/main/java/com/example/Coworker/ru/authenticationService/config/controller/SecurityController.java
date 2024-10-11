@@ -18,6 +18,7 @@ public class SecurityController {
     @Autowired
     UserService userService;
 
+    @Operation(summary = "checking auth controller works", responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))))
     @GetMapping("/home")
     public  String home(){
         return "This is Home";
