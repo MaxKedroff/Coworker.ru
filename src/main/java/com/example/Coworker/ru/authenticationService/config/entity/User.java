@@ -40,6 +40,8 @@ public class User implements UserDetails {
     // Authorities granted to the user, stored as a single string
     private String authorities;
 
+    private String fullName;
+
     /**
      * Returns the authorities granted to the user.
      * @return a collection of GrantedAuthority objects
