@@ -26,18 +26,6 @@ public class SecurityController {
     @Autowired
     UserService userService;
 
-    @Operation(summary = "checking auth controller works", responses = @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))))
-    @GetMapping("/home")
-    public  String home(){
-        return "This is Home";
-    }
-
-    @Operation(summary = "register new user", responses = {
-            @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", content = @Content),
-            @ApiResponse(responseCode = "500", content = @Content)
-    })
-
     @PostMapping("/register")
     public String create(@RequestBody UserDTO userDTO) throws MessagingException {
         return userService.create(userDTO);

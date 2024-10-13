@@ -8,6 +8,16 @@ public class UserDTO {
     @Pattern(regexp = "@.*@urfu\\.me$", message = "Email must end with @urfu.me")
     private String email;
 
+    public String getFull_name() {
+        return full_name;
+    }
+
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
+    }
+
+    private String full_name;
+
     private String password;
 
     public @Email(message = "Invalid email address") @Pattern(regexp = "@.*@urfu\\.me$", message = "Email must end with @urfu.me") String getEmail() {

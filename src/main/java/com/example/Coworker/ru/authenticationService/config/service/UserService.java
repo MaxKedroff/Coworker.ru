@@ -52,14 +52,17 @@ public class UserService implements UserDetailsService {
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
         final User user = (User) loadUserByUsername(authRequest.getEmail());
         System.out.println(user.getUsername());
-        if (new BCryptPasswordEncoder().matches(authRequest.getPassword(), user.getPassword())) {
-            final String accessToken = jwtProvider.generateAccessToken(user);
-            final String refreshToken = jwtProvider.generateRefreshToken(user);
-            refreshStorage.put(user.getUsername(), refreshToken);
-            return new JwtResponse(accessToken, refreshToken);
-        } else {
-            throw new AuthException("Неправильный пароль");
+        if (user.isActive()){
+            if (new BCryptPasswordEncoder().matches(authRequest.getPassword(), user.getPassword())) {
+                final String accessToken = jwtProvider.generateAccessToken(user);
+                final String refreshToken = jwtProvider.generateRefreshToken(user);
+                refreshStorage.put(user.getUsername(), refreshToken);
+                return new JwtResponse(accessToken, refreshToken);
+            } else {
+                throw new AuthException("Неправильный пароль");
+            }
         }
+        throw new AuthException("почта не найдена, или не активирована, пожалуйста проверьте почту на наличие письма");
     }
 
     public JwtResponse getAccessToken(@NonNull String refreshToken) throws AuthException {
@@ -111,6 +114,7 @@ public class UserService implements UserDetailsService {
                 .username(userDTO.getEmail())
                 .password(new BCryptPasswordEncoder().encode(userDTO.getPassword()))
                 .authorities("student")
+                .fullName(userDTO.getFull_name())
                 .verificationCode(verificationCode)
                 .build();
         userRepo.save(user);
