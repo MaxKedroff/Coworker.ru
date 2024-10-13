@@ -42,6 +42,10 @@ public class User implements UserDetails {
 
     private String fullName;
 
+    private String verificationCode;
+
+    private boolean active;
+
     /**
      * Returns the authorities granted to the user.
      * @return a collection of GrantedAuthority objects

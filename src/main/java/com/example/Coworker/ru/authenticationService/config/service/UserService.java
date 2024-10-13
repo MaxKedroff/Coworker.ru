@@ -8,11 +8,17 @@ import com.example.Coworker.ru.authenticationService.config.jwt.JwtRequest;
 import com.example.Coworker.ru.authenticationService.config.jwt.JwtResponse;
 import com.example.Coworker.ru.authenticationService.config.repository.UserRepo;
 import io.jsonwebtoken.Claims;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,19 +29,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepo userRepo;
 
-
+    private final JavaMailSender mailSender;
 
     private final Map<String, String> refreshStorage = new HashMap<>();
     private final JwtProvider jwtProvider;
 
+    @Autowired
+    public UserService(JavaMailSender mailSender, JwtProvider jwtProvider) {
+        this.mailSender = mailSender;
+        this.jwtProvider = jwtProvider;
+    }
 
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException {
@@ -90,19 +101,67 @@ public class UserService implements UserDetailsService {
         return userRepo.findByUsername(username);
     }
 
-    public String create(UserDTO userDTO){
+    public String create(UserDTO userDTO) throws MessagingException {
 
         if (!userDTO.getEmail().endsWith("@urfu.me")){
             return "sorry, we only work with @urfu.me mails, this is private system";
         }
+        String verificationCode = generateVerificationCode();
         User user = User.builder()
                 .username(userDTO.getEmail())
                 .password(new BCryptPasswordEncoder().encode(userDTO.getPassword()))
                 .authorities("student")
+                .verificationCode(verificationCode)
                 .build();
         userRepo.save(user);
+        sendConfirmationEmail(user);
         return "Create Successfully!";
     }
 
+    private String generateVerificationCode(){
+        return RandomStringUtils.randomAlphanumeric(64);
+    }
 
+    private void sendConfirmationEmail(User user) throws MessagingException {
+        String toAddress = user.getUsername();
+        String subject = "Please verify your registration";
+        String content = createEmailContent(user);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+        helper.setText(content, true);
+
+        mailSender.send(message);
+    }
+    private String createEmailContent(User user) {
+        String verifyURL = "http://localhost:8070/api/auth/verify?code=" + user.getVerificationCode();
+        return String.format(
+                "Dear %s,\n\n" +
+                        "Thank you for registering.\n" +
+                        "Please click on the following link to verify your account:\n" +
+                        "<a href='%s'>Verify Account</a>\n\n" +
+                        "Best regards,\n" +
+                        "Your Application",
+                user.getUsername(), verifyURL
+        );
+    }
+    public boolean handleVerification(String code) {
+        Optional<User> optionalUser = userRepo.findByVerificationCode(code);
+        boolean isVerified = false;
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setActive(true);
+            user.setVerificationCode(null);
+            userRepo.save(user);
+            return true;
+        }
+        return false;
+    }
+    public boolean isActiveUser(String email){
+        User user = userRepo.findByUsername(email);
+        return user.isActive();
+    }
 }

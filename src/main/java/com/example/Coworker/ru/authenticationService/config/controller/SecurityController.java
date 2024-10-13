@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class SecurityController {
     })
 
     @PostMapping("/register")
-    public String create(@RequestBody UserDTO userDTO){
+    public String create(@RequestBody UserDTO userDTO) throws MessagingException {
         return userService.create(userDTO);
     }
     @PostMapping("login")
@@ -51,6 +52,13 @@ public class SecurityController {
         final JwtResponse token = userService.getAccessToken(request.getRefreshToken());
         return ResponseEntity.ok(token);
     }
+    @GetMapping("/verify")
+    public ResponseEntity<String> handleVerification(@RequestParam String code){
+        if(userService.handleVerification(code)){
+            return ResponseEntity.ok("успешная верификация");
+        }
+        return ResponseEntity.badRequest().body("something go wrong");
+    }
 
     @PostMapping("refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody RefreshJwtRequest request) throws AuthException {
@@ -58,6 +66,7 @@ public class SecurityController {
         return ResponseEntity.ok(token);
     }
 
+    @Operation(summary = "checking authorization works with token")
     @PreAuthorize("hasAuthority('student')")
     @GetMapping("hello/user")
     public ResponseEntity<String> helloUser() {
