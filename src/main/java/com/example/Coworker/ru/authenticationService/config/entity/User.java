@@ -1,5 +1,7 @@
 package com.example.Coworker.ru.authenticationService.config.entity;
 
+import com.example.Coworker.ru.mainService.common.entity.Booking;
+import com.example.Coworker.ru.mainService.common.entity.Review;
 import jakarta.persistence.*;
 import lombok.*; // Import Lombok annotations
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails {
     // Delimiter used to split authorities string
     private static final String AUTHORITIES_DELIMITER = "::";
@@ -29,7 +31,7 @@ public class User implements UserDetails {
     // Unique identifier for the user
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     // Username of the user
     private String username;
@@ -45,6 +47,12 @@ public class User implements UserDetails {
     private String verificationCode;
 
     private boolean active;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Review> reviews;
 
     /**
      * Returns the authorities granted to the user.

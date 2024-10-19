@@ -32,8 +32,12 @@ public class SecurityController {
     }
     @PostMapping("login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
-        final JwtResponse token = userService.login(authRequest);
-        return ResponseEntity.ok(token);
+        try{
+            final JwtResponse token = userService.login(authRequest);
+            return ResponseEntity.ok(token);
+        }catch (AuthException e){
+            return ResponseEntity.notFound().build();
+        }
     }
     @PostMapping("token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
@@ -56,10 +60,10 @@ public class SecurityController {
 
     @Operation(summary = "checking authorization works with token")
     @PreAuthorize("hasAuthority('student')")
-    @GetMapping("hello/user")
+    @GetMapping("hello/student")
     public ResponseEntity<String> helloUser() {
 //        final JwtAuthentication authInfo = userService.getAuthInfo();
 //        return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
-        return ResponseEntity.ok("прошел авторизацию по юзеру");
+        return ResponseEntity.ok("прошел авторизацию по студенту");
     }
 }
