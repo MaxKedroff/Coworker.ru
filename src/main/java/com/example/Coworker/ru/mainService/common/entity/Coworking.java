@@ -2,8 +2,10 @@ package com.example.Coworker.ru.mainService.common.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -12,24 +14,32 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "coworkings")
+@Table(name = "Coworkings",
+    indexes = {
+        @Index(name = "idx_name", columnList = "name")
+    })
 public class Coworking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long coworkingId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "coworking_id", updatable = false, nullable = false)
+    private UUID coworkingId;
 
+    @Column(columnDefinition = "VARCHAR(50)", nullable = false, name = "name")
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    //фото тут
+    @Column(name = "main_photo")
+    private String mainPhoto;
 
+    @Column(columnDefinition = "VARCHAR(50)")
     private String address;
 
-    @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings;
 
-    @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews;
 }
