@@ -8,6 +8,7 @@ import com.example.Coworker.ru.authenticationService.config.jwt.JwtResponse;
 import com.example.Coworker.ru.authenticationService.config.jwt.RefreshJwtRequest;
 import com.example.Coworker.ru.authenticationService.config.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,15 +22,23 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "authentication", description = "Operations related to authentication and authorization")
+@Tag(name = "authentication", description = "полный цикл аутентификации,авторизации и регистрации пользователя")
 public class SecurityController {
     @Autowired
     UserService userService;
 
+    @Operation(
+            summary = "регистрация пользователя",
+            description = "регистрация пользователя c дальнейшей верификацией"
+    )
     @PostMapping("/register")
-    public String create(@RequestBody UserDTO userDTO) throws MessagingException {
+    public String create(@RequestBody @Parameter(description = "необходимые данные для регистрации") UserDTO userDTO) throws MessagingException {
         return userService.create(userDTO);
     }
+    @Operation(
+            summary = "аутентификация пользователя",
+            description = "при верных данных выдается токен : во все запросы вставлять в bearer token "
+    )
     @PostMapping("login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
         try{
@@ -39,6 +48,9 @@ public class SecurityController {
             return ResponseEntity.notFound().build();
         }
     }
+    @Operation(
+            summary = "получение нового токена(*на будущее) пока время не тратить"
+    )
     @PostMapping("token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
         final JwtResponse token = userService.getAccessToken(request.getRefreshToken());
@@ -52,6 +64,9 @@ public class SecurityController {
         return ResponseEntity.badRequest().body("something go wrong");
     }
 
+    @Operation(
+            summary = "обновление токена(*на будущее)"
+    )
     @PostMapping("refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody RefreshJwtRequest request) throws AuthException {
         final JwtResponse token = userService.refresh(request.getRefreshToken());
