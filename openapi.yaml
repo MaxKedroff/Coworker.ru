@@ -1,0 +1,285 @@
+openapi: 3.0.1
+info:
+  title: Coworker api service
+  description: документация rest-full сервиса CoworkerApi
+  contact:
+    name: Kedrov Maksim
+    url: https://t.me/maxKedroff
+    email: kedrov.maksim2005@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://localhost:8070
+    description: Generated server url
+tags:
+  - name: authentication
+    description: полный цикл аутентификации,авторизации и регистрации пользователя
+paths:
+  /api/auth/token:
+    post:
+      tags:
+        - authentication
+      summary: получение нового токена(*на будущее) пока время не тратить
+      operationId: getNewAccessToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshJwtRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+  /api/auth/register:
+    post:
+      tags:
+        - authentication
+      summary: регистрация пользователя
+      description: регистрация пользователя c дальнейшей верификацией
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/auth/refresh:
+    post:
+      tags:
+        - authentication
+      summary: обновление токена(*на будущее)
+      operationId: getNewRefreshToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshJwtRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+  /api/auth/login:
+    post:
+      tags:
+        - authentication
+      summary: аутентификация пользователя
+      description: 'при верных данных выдается токен : во все запросы вставлять в bearer token '
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JwtRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JwtResponse'
+  /api/main/{coworking}:
+    get:
+      tags:
+        - main-controller
+      operationId: getCoworking
+      parameters:
+        - name: coworkingName
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Coworking'
+  /api/main/:
+    get:
+      tags:
+        - main-controller
+      operationId: getAllCoworkings
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Coworking'
+  /api/auth/verify:
+    get:
+      tags:
+        - authentication
+      operationId: handleVerification
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/auth/hello/student:
+    get:
+      tags:
+        - authentication
+      summary: checking authorization works with token
+      operationId: helloUser
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  schemas:
+    RefreshJwtRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    JwtResponse:
+      type: object
+      properties:
+        type:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        email:
+          pattern: '@.*@urfu\.me$'
+          type: string
+        full_name:
+          type: string
+        password:
+          type: string
+      description: необходимые данные для регистрации
+    JwtRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Booking:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+        coworking:
+          $ref: '#/components/schemas/Coworking'
+        bookingDateStart:
+          type: string
+          format: date
+        bookingDateEnd:
+          type: string
+          format: date
+    Coworking:
+      type: object
+      properties:
+        coworkingId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        mainPhoto:
+          type: string
+        address:
+          type: string
+        bookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+    GrantedAuthority:
+      type: object
+      properties:
+        authority:
+          type: string
+    Review:
+      type: object
+      properties:
+        reviewId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+        coworking:
+          $ref: '#/components/schemas/Coworking'
+        rating:
+          type: integer
+          format: int32
+        reviewText:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        password:
+          type: string
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantedAuthority'
+        fullName:
+          type: string
+        verificationCode:
+          type: string
+        active:
+          type: boolean
+        bookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+        reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+        enabled:
+          type: boolean
+        accountNonExpired:
+          type: boolean
+        credentialsNonExpired:
+          type: boolean
+        accountNonLocked:
+          type: boolean
