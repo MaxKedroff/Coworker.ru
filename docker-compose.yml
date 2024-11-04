@@ -1,21 +1,36 @@
-version: '3'
+version: "3.7"
 services:
-  spring-boot-app:
+  api_service:
     build: .
+    restart: always
     ports:
-      - "8070:8070"
+      - 8070:8070
+    networks:
+      - springapimysql-net
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/security_db
-      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - spring.datasource.url=jdbc:mysql://mysqldb:3306/security_db?createDatabaseIfNotExist=true
     depends_on:
-      - mysql
-  mysql:
-    build: ./mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      mysqldb:
+          condition: service_healthy
+
+    volumes:
+      - .m2:/root/.m2
+
+  mysqldb:
+    image: "mysql:8.0"
+    restart: always
     ports:
-      - "3306:3306"
+      - 3307:3306
+    networks:
+      - springapimysql-net
+    environment:
+      MYSQL_DATABASE: security_db
+      MYSQL_USER: maksim
+      MYSQL_PASSWORD: vfrcbv2005
+      MYSQL_ROOT_PASSWORD: vfrcbv2005
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 1
+networks:
+  springapimysql-net:

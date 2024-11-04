@@ -107,7 +107,10 @@ public class UserService implements UserDetailsService {
     public String create(UserDTO userDTO) throws MessagingException {
 
         if (!userDTO.getEmail().endsWith("@urfu.me")){
-            return "sorry, we only work with @urfu.me mails, this is private system";
+            return "мы работает только с корпоративными почтами урфу, заканчивающимися на @urfu.me";
+        }
+        if (userRepo.findByUsername(userDTO.getEmail()) != null){
+            return "похоже, что аккаунт уже существует";
         }
         String verificationCode = generateVerificationCode();
         User user = User.builder()
