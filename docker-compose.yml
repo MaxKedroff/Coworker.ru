@@ -1,36 +1,24 @@
 version: "3.7"
 services:
   api_service:
+    image: 'coworker-postgres:latest'
     build: .
-    restart: always
     ports:
       - 8070:8070
-    networks:
-      - springapimysql-net
     environment:
-      - spring.datasource.url=jdbc:mysql://mysqldb:3306/security_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/security_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=vfrcbv2005
     depends_on:
-      mysqldb:
-          condition: service_healthy
-
-    volumes:
-      - .m2:/root/.m2
-
-  mysqldb:
-    image: "mysql:8.0"
-    restart: always
-    ports:
-      - 3307:3306
-    networks:
-      - springapimysql-net
+      - db
+  db:
+    image: "postgres:latest"
+    container_name: db
     environment:
-      MYSQL_DATABASE: security_db
-      MYSQL_USER: maksim
-      MYSQL_PASSWORD: vfrcbv2005
-      MYSQL_ROOT_PASSWORD: vfrcbv2005
-    healthcheck:
-      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
-      timeout: 10s
-      retries: 1
-networks:
-  springapimysql-net:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=vfrcbv2005
+      - POSTGRES_DB=security_db
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
