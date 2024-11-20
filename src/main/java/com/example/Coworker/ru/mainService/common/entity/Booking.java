@@ -8,6 +8,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -40,8 +41,11 @@ public class Booking {
     private Coworking coworking;
 
     @Column(name = "start_time", nullable = false)
-    private LocalDate bookingDateStart;
+    private LocalDateTime bookingDateStart;
 
     @Column(name = "end_time", nullable = false)
-    private LocalDate bookingDateEnd;
+    private LocalDateTime bookingDateEnd;
+
+    @Column(name = "is_expired", nullable = false)
+    private Boolean isExpired = false;
 }
