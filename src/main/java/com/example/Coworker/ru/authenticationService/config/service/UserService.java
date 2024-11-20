@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -38,7 +39,6 @@ public class UserService implements UserDetailsService {
     private UserRepo userRepo;
 
     private final JavaMailSender mailSender;
-
     private final Map<String, String> refreshStorage = new HashMap<>();
     private final JwtProvider jwtProvider;
 
@@ -127,6 +127,13 @@ public class UserService implements UserDetailsService {
 
     private String generateVerificationCode(){
         return RandomStringUtils.randomAlphanumeric(64);
+    }
+    public String getUserByToken(String token){
+        return jwtProvider.getAccessClaims(token).getSubject();
+    }
+
+    public User getByUsername(String username){
+        return userRepo.findByUsername(username);
     }
 
     private void sendConfirmationEmail(User user) throws MessagingException {

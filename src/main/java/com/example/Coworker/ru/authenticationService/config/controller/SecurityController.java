@@ -76,9 +76,10 @@ public class SecurityController {
     @Operation(summary = "checking authorization works with token")
     @PreAuthorize("hasAuthority('student')")
     @GetMapping("hello/student")
-    public ResponseEntity<String> helloUser() {
+    public ResponseEntity<String> helloUser(@RequestHeader("Authorization") String header) {
 //        final JwtAuthentication authInfo = userService.getAuthInfo();
 //        return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
-        return ResponseEntity.ok("прошел авторизацию по студенту");
+        String token = header.substring(7);
+        return ResponseEntity.ok(userService.getUserByToken(token));
     }
 }
