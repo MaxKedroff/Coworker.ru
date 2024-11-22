@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @RestController
 @PreAuthorize("hasAuthority('student')")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RequestMapping("api/main/")
 public class MainController {
 

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/main/door")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @EnableScheduling
 public class DoorController {
 

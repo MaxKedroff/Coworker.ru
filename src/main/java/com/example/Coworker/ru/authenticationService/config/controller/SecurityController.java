@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @Tag(name = "authentication", description = "полный цикл аутентификации,авторизации и регистрации пользователя")
 public class SecurityController {
     @Autowired
@@ -81,5 +82,11 @@ public class SecurityController {
 //        return ResponseEntity.ok("Hello user " + authInfo.getPrincipal() + "!");
         String token = header.substring(7);
         return ResponseEntity.ok(userService.getUserByToken(token));
+    }
+
+
+    @GetMapping("test")
+    public ResponseEntity<String> checkCORS(){
+        return ResponseEntity.ok("CORS настроен");
     }
 }
