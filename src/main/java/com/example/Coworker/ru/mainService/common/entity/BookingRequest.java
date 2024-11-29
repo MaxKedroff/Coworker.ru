@@ -10,4 +10,5 @@ public class BookingRequest {
     private String coworkingId;   // UUID коворкинга
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private int capacity;
 }

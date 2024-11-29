@@ -9,4 +9,6 @@ public class CoworkingRequest {
     private String description;
 
     private String address;
+
+    private int totalCapacity;
 }

@@ -34,6 +34,9 @@ public class Coworking {
     @Column(name = "main_photo")
     private String mainPhoto;
 
+    @Column(nullable = true)
+    private Integer totalCapacity;
+
     @Column(columnDefinition = "VARCHAR(50)")
     private String address;
 
