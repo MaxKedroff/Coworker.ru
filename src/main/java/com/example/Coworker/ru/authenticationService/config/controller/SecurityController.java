@@ -33,8 +33,13 @@ public class SecurityController {
             description = "регистрация пользователя c дальнейшей верификацией"
     )
     @PostMapping("/register")
-    public String create(@RequestBody @Parameter(description = "необходимые данные для регистрации") UserDTO userDTO) throws MessagingException {
-        return userService.create(userDTO);
+    public ResponseEntity<String> create(@RequestBody @Parameter(description = "необходимые данные для регистрации") UserDTO userDTO) throws MessagingException, AuthException {
+        try {
+            return ResponseEntity.ok(userService.create(userDTO));
+
+        }catch (AuthException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     @Operation(
             summary = "аутентификация пользователя",
@@ -46,6 +51,9 @@ public class SecurityController {
             final JwtResponse token = userService.login(authRequest);
             return ResponseEntity.ok(token);
         }catch (AuthException e){
+            if (e.getMessage().equals("Неправильный пароль")) {
+                return ResponseEntity.status(401).build();
+            }
             return ResponseEntity.notFound().build();
         }
     }
