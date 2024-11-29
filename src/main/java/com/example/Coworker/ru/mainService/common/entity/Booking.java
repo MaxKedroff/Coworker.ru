@@ -35,6 +35,8 @@ public class Booking {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
+    private int capacity;
+
     @ManyToOne
     @JoinColumn(name = "coworking_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

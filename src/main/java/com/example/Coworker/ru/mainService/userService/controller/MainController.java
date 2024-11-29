@@ -1,5 +1,6 @@
 package com.example.Coworker.ru.mainService.userService.controller;
 
+import com.example.Coworker.ru.mainService.common.entity.AvailabilityRequest;
 import com.example.Coworker.ru.mainService.common.entity.Coworking;
 import com.example.Coworker.ru.mainService.userService.service.MainPageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,5 +31,13 @@ public class MainController {
         return ResponseEntity.status(200).body(mainPageService.getCoworkingById(id));
     }
 
-
+    @PostMapping("/availability")
+    public ResponseEntity<List<Coworking>> getAvailableCoworkings(@RequestBody AvailabilityRequest request) {
+        List<Coworking> availableCoworkings = mainPageService.findAvailableCoworkings(
+                request.getDateTimeStart(),
+                request.getDateTimeEnd(),
+                request.getCapacity()
+        );
+        return ResponseEntity.ok(availableCoworkings);
+    }
 }
