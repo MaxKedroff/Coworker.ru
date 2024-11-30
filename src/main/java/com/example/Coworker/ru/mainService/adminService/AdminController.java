@@ -1,10 +1,15 @@
 package com.example.Coworker.ru.mainService.adminService;
 
 
+import com.example.Coworker.ru.mainService.common.entity.Coworking;
 import com.example.Coworker.ru.mainService.common.entity.CoworkingRequest;
+import com.example.Coworker.ru.mainService.userService.service.MainPageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/main/admin")

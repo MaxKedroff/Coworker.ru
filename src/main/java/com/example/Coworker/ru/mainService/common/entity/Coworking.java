@@ -1,5 +1,6 @@
 package com.example.Coworker.ru.mainService.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
@@ -41,8 +42,10 @@ public class Coworking {
     private String address;
 
     @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Booking> bookings;
 
     @OneToMany(mappedBy = "coworking", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Review> reviews;
 }

@@ -38,7 +38,7 @@ public class BookingService {
         booking.setCoworking(coworking);
         booking.setBookingDateStart(request.getStartTime());
         booking.setBookingDateEnd(request.getEndTime());
-
+        booking.setCapacity(request.getCapacity());
         bookingRepo.save(booking);
     }
 }

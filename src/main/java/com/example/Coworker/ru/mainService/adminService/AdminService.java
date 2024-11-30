@@ -6,6 +6,8 @@ import com.example.Coworker.ru.mainService.common.repository.CoworkingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AdminService {
 
@@ -17,6 +19,11 @@ public class AdminService {
         coworking.setName(coworkingRequest.getName());
         coworking.setDescription(coworkingRequest.getDescription());
         coworking.setAddress(coworkingRequest.getAddress());
+        coworking.setTotalCapacity(coworkingRequest.getTotalCapacity());
         coworkingRepo.save(coworking);
+    }
+    public void deleteCoworking(UUID uuid){
+        Coworking coworking = coworkingRepo.findById(uuid).get();
+        coworkingRepo.delete(coworking);
     }
 }

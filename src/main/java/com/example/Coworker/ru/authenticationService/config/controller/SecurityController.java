@@ -34,12 +34,13 @@ public class SecurityController {
     )
     @PostMapping("/register")
     public ResponseEntity<String> create(@RequestBody @Parameter(description = "необходимые данные для регистрации") UserDTO userDTO) throws MessagingException, AuthException {
-        try {
-            return ResponseEntity.ok(userService.create(userDTO));
-
-        }catch (AuthException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        String res = userService.create(userDTO);
+        if (res.equals("мы работает только с корпоративными почтами урфу, заканчивающимися на @urfu.me")){
+            return ResponseEntity.status(400).body("мы работаем только с корпоративными почтами урфу, заканчивающимися на @urfu.me");
+        }else if (res.equals("похоже, что аккаунт уже существует")){
+            return ResponseEntity.status(409).body("похоже, что аккаунт уже существует");
         }
+        return ResponseEntity.ok(res);
     }
     @Operation(
             summary = "аутентификация пользователя",
@@ -51,9 +52,6 @@ public class SecurityController {
             final JwtResponse token = userService.login(authRequest);
             return ResponseEntity.ok(token);
         }catch (AuthException e){
-            if (e.getMessage().equals("Неправильный пароль")) {
-                return ResponseEntity.status(401).build();
-            }
             return ResponseEntity.notFound().build();
         }
     }

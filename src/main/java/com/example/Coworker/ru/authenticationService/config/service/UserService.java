@@ -107,10 +107,10 @@ public class UserService implements UserDetailsService {
     public String create(UserDTO userDTO) throws MessagingException, AuthException {
 
         if (!userDTO.getEmail().endsWith("@urfu.me")){
-            throw new AuthException("мы работает только с корпоративными почтами урфу, заканчивающимися на @urfu.me");
+            return "мы работает только с корпоративными почтами урфу, заканчивающимися на @urfu.me";
         }
         if (userRepo.findByUsername(userDTO.getEmail()) != null){
-            throw new AuthException("похоже, что аккаунт уже существует");
+            return "похоже, что аккаунт уже существует";
         }
         String verificationCode = generateVerificationCode();
         User user = User.builder()
