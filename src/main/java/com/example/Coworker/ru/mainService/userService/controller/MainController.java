@@ -2,6 +2,7 @@ package com.example.Coworker.ru.mainService.userService.controller;
 
 import com.example.Coworker.ru.mainService.common.entity.AvailabilityRequest;
 import com.example.Coworker.ru.mainService.common.entity.Coworking;
+import com.example.Coworker.ru.mainService.common.entity.CoworkingAvailabilityDTO;
 import com.example.Coworker.ru.mainService.userService.service.MainPageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class MainController {
     }
 
     @PostMapping("/availability")
-    public ResponseEntity<List<Coworking>> getAvailableCoworkings(@RequestBody AvailabilityRequest request) {
-        List<Coworking> availableCoworkings = mainPageService.findAvailableCoworkings(
+    public ResponseEntity<List<CoworkingAvailabilityDTO>> getAvailableCoworkings(@RequestBody AvailabilityRequest request) {
+        List<CoworkingAvailabilityDTO> availableCoworkings = mainPageService.findAvailableCoworkingsFix(
                 request.getDateTimeStart(),
                 request.getDateTimeEnd(),
                 request.getCapacity()

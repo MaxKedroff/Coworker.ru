@@ -1,6 +1,7 @@
 package com.example.Coworker.ru.mainService.userService.service;
 
 import com.example.Coworker.ru.mainService.common.entity.Coworking;
+import com.example.Coworker.ru.mainService.common.entity.CoworkingAvailabilityDTO;
 import com.example.Coworker.ru.mainService.common.repository.BookingRepo;
 import com.example.Coworker.ru.mainService.common.repository.CoworkingRepo;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,6 +52,31 @@ public class MainPageService {
                     int availableCapacity = coworkingCapacity - bookedCapacity;
                     return availableCapacity >= capacity;
                 })
+                .collect(Collectors.toList());
+    }
+
+    public List<CoworkingAvailabilityDTO> findAvailableCoworkingsFix(LocalDateTime dateTimeStart, LocalDateTime dateTimeEnd, int capacity) {
+        List<Coworking> allCoworkings = coworkingRepo.findAll();
+        return allCoworkings.stream()
+                .map(coworking -> {
+                    int coworkingCapacity = coworking.getTotalCapacity() != null
+                            ? coworking.getTotalCapacity()
+                            : DEFAULT_CAPACITY; // Используем вместимость по умолчанию
+
+                    int bookedCapacity = bookingRepo.getTotalCapacityForCoworking(
+                            coworking.getCoworkingId(), dateTimeStart, dateTimeEnd);
+
+                    int availableCapacity = coworkingCapacity - bookedCapacity;
+                    return new CoworkingAvailabilityDTO(
+                      coworking.getCoworkingId(),
+                      coworking.getName(),
+                      coworking.getAddress(),
+                      coworkingCapacity,
+                      bookedCapacity,
+                      availableCapacity
+                    );
+                })
+                .filter(coworkingAvailabilityDTO -> coworkingAvailabilityDTO.getAvailableCapacity() >= capacity )
                 .collect(Collectors.toList());
     }
 }
